@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  rabbit:
+    image: 'rabbitmq:3.7.1'
+    ports:
+      - 9000:5672
+    volumes:
+      - ./services/rabbitmq/data:/var/lib/rabbitmq/mnesia/rabbit
+    healthcheck:
+      test: exit 0
+
+  logger:
+    build: ./services/logger
+    environment:
+      rabbitConnectionString: "amqp://rabbit"
+      log__level: "#"
+    links:
+      - rabbit
+    volumes:
+      - ./services/logger:/usr/src/app
+      - ./shared:/usr/shared

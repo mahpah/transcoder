@@ -30,4 +30,6 @@ export const createLogger = async (connectionString: string, configs: LogConfig)
       handler(msg.content.toString(), msg.fields.routingKey)
     }, { noAck: true })
   })
+
+  return logQueue.queue
 }

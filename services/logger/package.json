@@ -8,24 +8,24 @@
     "compile": "tsc -p tsconfig.json",
     "clean": "rimraf dist",
     "copy": "cpx src/config/*.json dist/config/",
-    "build": "run-s clean compile copy"
+    "build": "run-s clean compile copy",
+    "prestart": "npm run build",
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "Ha Pham <mahpahh@gmail.com> (http://mahpahh.com)",
   "license": "ISC",
   "devDependencies": {
     "@types/amqplib": "^0.5.5",
-    "copy": "^0.3.1",
     "cpx": "^1.5.0",
     "npm-run-all": "^4.1.2",
     "rimraf": "^2.6.2",
-    "rollup-plugin-node-resolve": "^3.0.0",
     "tslib": "^1.8.1",
     "tslint": "^5.8.0",
     "typescript": "^2.6.2"
   },
   "dependencies": {
-    "amqplib": "^0.5.2",
-    "copy-dir": "^0.3.0"
+    "@mahpah/configuration": "^1.0.0",
+    "amqplib": "^0.5.2"
   }
 }
