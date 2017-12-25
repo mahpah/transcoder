@@ -26,6 +26,8 @@
       "src/@types"
     ],
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "noEmitHelpers": true,
+    "importHelpers": true
   }
 }

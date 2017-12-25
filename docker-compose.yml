@@ -1,4 +1,5 @@
-version: '3'
+# using 2.1 since depends_on not available on v3
+version: '2.1'
 
 services:
   rabbit:
@@ -9,14 +10,41 @@ services:
       - ./services/rabbitmq/data:/var/lib/rabbitmq/mnesia/rabbit
     healthcheck:
       test: exit 0
+      interval: 10s
+      timeout: 10s
+      retries: 3
 
   logger:
     build: ./services/logger
     environment:
       rabbitConnectionString: "amqp://rabbit"
-      log__level: "#"
+      DEBUG: "*"
     links:
       - rabbit
-    volumes:
-      - ./services/logger:/usr/src/app
-      - ./shared:/usr/shared
+    depends_on:
+      rabbit:
+        condition: service_healthy
+
+  indexer:
+    build: ./services/index-service
+    environment:
+      rabbitConnectionString: "amqp://rabbit"
+      DEBUG: "*"
+    links:
+      - rabbit
+      - logger
+    depends_on:
+      rabbit:
+        condition: service_healthy
+
+  dasher:
+    build: ./services/dasher
+    environment:
+      rabbitConnectionString: "amqp://rabbit"
+      DEBUG: "*"
+    links:
+      - rabbit
+      - logger
+    depends_on:
+      rabbit:
+        condition: service_healthy

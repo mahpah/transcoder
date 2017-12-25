@@ -9,7 +9,7 @@ createLogger(rabbitConnectionString, {
   '#': (msg, key) => console.log(`${new Date()} [${toUpper(key) || '*'}] ${msg}`)
 })
 .then((queue: string) => {
-  console.log(`Connected to ${rabbitConnectionString}`)
+  console.log(`Successfully connected to ${rabbitConnectionString}`)
   console.log(`QUEUE: ${queue}\n`)
 })
 .catch(console.error)

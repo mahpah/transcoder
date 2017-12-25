@@ -1,5 +1,5 @@
 {
-  "name": "logger",
+  "name": "dasher",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,19 +11,21 @@
     "prestart": "npm run build",
     "start": "node dist/index.js"
   },
-  "keywords": [],
-  "author": "Ha Pham <mahpahh@gmail.com> (http://mahpahh.com)",
-  "license": "ISC",
   "devDependencies": {
     "@types/amqplib": "^0.5.5",
-    "npm-run-all": "^4.1.2",
+    "@types/debug": "0.0.30",
     "rimraf": "^2.6.2",
     "tslib": "^1.8.1",
     "tslint": "^5.8.0",
+    "npm-run-all": "^4.1.2",
     "typescript": "^2.6.2"
   },
   "dependencies": {
     "@mahpah/configuration": "^1.0.4",
-    "amqplib": "^0.5.2"
-  }
+    "amqplib": "^0.5.2",
+    "debug": "^3.1.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

@@ -1,5 +1,5 @@
 {
-  "name": "logger",
+  "name": "index-service",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -12,10 +12,11 @@
     "start": "node dist/index.js"
   },
   "keywords": [],
-  "author": "Ha Pham <mahpahh@gmail.com> (http://mahpahh.com)",
+  "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/amqplib": "^0.5.5",
+    "@types/debug": "0.0.30",
     "npm-run-all": "^4.1.2",
     "rimraf": "^2.6.2",
     "tslib": "^1.8.1",
@@ -24,6 +25,7 @@
   },
   "dependencies": {
     "@mahpah/configuration": "^1.0.4",
-    "amqplib": "^0.5.2"
+    "amqplib": "^0.5.2",
+    "debug": "^3.1.0"
   }
 }

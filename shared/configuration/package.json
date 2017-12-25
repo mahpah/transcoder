@@ -1,6 +1,6 @@
 {
   "name": "@mahpah/configuration",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "Simple configuration loader",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -15,7 +15,11 @@
   "author": "mahpah",
   "license": "ISC",
   "devDependencies": {
+    "@types/debug": "0.0.30",
     "@types/node": "^8.5.2",
     "typescript": "^2.6.2"
+  },
+  "dependencies": {
+    "debug": "^3.1.0"
   }
 }

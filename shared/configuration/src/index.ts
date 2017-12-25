@@ -1,5 +1,8 @@
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
+import * as createDebug from 'debug'
+
+const debug = createDebug('configuration')
 
 export type Configuration = {
   [key: string]: any,
@@ -7,11 +10,14 @@ export type Configuration = {
 
 const loadJsonFile = (filename: string): Configuration => {
   const path = resolve(process.cwd(), filename)
+  debug(`Load file ${path}`)
 
   try {
     const text = readFileSync(path).toString()
     return JSON.parse(text)
   } catch (e) {
+    debug(`cannot load config file ${path}`)
+    debug(e)
     return {}
   }
 }

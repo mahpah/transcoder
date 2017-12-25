@@ -1,0 +1,5 @@
+{
+  "esConnection": "",
+  "rabbitConnectionString": "amqp://localhost",
+  "appName": "Indexer"
+}
