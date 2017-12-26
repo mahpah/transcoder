@@ -1,0 +1,4 @@
+{
+  "rabbitConnectionString": "amqp://localhost",
+  "storagePath": "../../data/storage"
+}

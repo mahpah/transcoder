@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch",
+      "sourceMaps": true,
+      "stopOnEntry": false,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceRoot}",
+      "runtimeArgs": [
+        "--nolazy"
+      ],
+      "runtimeExecutable": "node",
+      "program": "${workspaceRoot}/src/index.ts",
+      "outFiles": ["${workspaceRoot}/dist/index.js"],
+      "preLaunchTask": "build",
+      "env": {},
+      "skipFiles": [
+        "node_modules"
+      ]
+    }
+  ]
+}

@@ -5,7 +5,6 @@ const getAvailableSizes = async (filePath: string, encodeSizes: number[]) => {
   try {
     const data = await readMetadata(filePath)
     const videoWidth = data.streams.filter(t => t.codec_type === 'video').map(t => t.width)[0] as number
-    console.log(videoWidth)
     const avaiableSizes = encodeSizes.filter(t => t < videoWidth)
     return [...avaiableSizes, videoWidth]
   } catch {

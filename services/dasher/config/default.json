@@ -7,5 +7,6 @@
     1280
   ],
   "outDir": "../../data/out",
-  "tmpDir": "../../data/tmp"
+  "tmpDir": "../../data/tmp",
+  "storagePath": "../../data/storage"
 }

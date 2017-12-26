@@ -18,7 +18,6 @@ services:
     build: ./services/logger
     environment:
       rabbitConnectionString: "amqp://rabbit"
-      DEBUG: "*"
     links:
       - rabbit
     depends_on:
@@ -29,7 +28,6 @@ services:
     build: ./services/index-service
     environment:
       rabbitConnectionString: "amqp://rabbit"
-      DEBUG: "*"
     links:
       - rabbit
       - logger
@@ -43,10 +41,11 @@ services:
       rabbitConnectionString: "amqp://rabbit"
       tmpDir: "/tmpDir"
       outDir: "/outDir"
-      DEBUG: "*"
-      workerCount: 4
+      storagePath: "/storage"
+      workerCount: 2
     volumes:
       - ./shared-volumes/dash-output:/outDir
+      - ./shared-volumes/storage:/storage
     links:
       - rabbit
       - logger
@@ -54,3 +53,15 @@ services:
       rabbit:
         condition: service_healthy
 
+  web:
+    build: ./services/web
+    ports:
+      - 5000:3333
+    environment:
+      rabbitConnectionString: "amqp://rabbit"
+      storagePath: "/storage"
+    links:
+      - rabbit
+      - logger
+    volumes:
+      - ./shared-volumes/storage:/storage
