@@ -4,8 +4,9 @@ import { createLogger } from './logger'
 const startApp = async () => {
   const logger = await createLogger(Config.rabbitConnectionString, Config.appName)
   logger.info('connected')
+  console.log('connected')
 
-  process.on('exit', () => {
+  process.on('SIGINT', () => {
     console.log('exit')
     logger.info('exited')
   })

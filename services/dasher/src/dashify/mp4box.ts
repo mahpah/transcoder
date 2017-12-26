@@ -21,7 +21,6 @@ export const mp4box = (inputFiles: string[], outDir: string, outName: string) =>
   mkdirp(outDir)
   return new Promise((resolve, reject) => {
     const command = mp4boxCommand(outName, outDir, inputFiles)
-    console.log(command)
     exec(command, (err, _, stderr) => {
       if (err) {
         reject(stderr)

@@ -41,10 +41,16 @@ services:
     build: ./services/dasher
     environment:
       rabbitConnectionString: "amqp://rabbit"
+      tmpDir: "/tmpDir"
+      outDir: "/outDir"
       DEBUG: "*"
+      workerCount: 4
+    volumes:
+      - ./shared-volumes/dash-output:/outDir
     links:
       - rabbit
       - logger
     depends_on:
       rabbit:
         condition: service_healthy
+

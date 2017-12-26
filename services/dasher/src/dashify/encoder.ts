@@ -2,17 +2,29 @@ import { readMetadata, encodeAudio, encodeVideo } from './ffmpeg'
 import { sync as mkdirp } from 'mkdirp'
 
 const getAvailableSizes = async (filePath: string, encodeSizes: number[]) => {
-  const data = await readMetadata(filePath)
-  const videoWidth = data.streams.filter(t => t.codec_type === 'video').map(t => t.width)[0] as number
-  console.log(videoWidth)
-  const avaiableSizes = encodeSizes.filter(t => t < videoWidth)
-  return [...avaiableSizes, videoWidth]
+  try {
+    const data = await readMetadata(filePath)
+    const videoWidth = data.streams.filter(t => t.codec_type === 'video').map(t => t.width)[0] as number
+    console.log(videoWidth)
+    const avaiableSizes = encodeSizes.filter(t => t < videoWidth)
+    return [...avaiableSizes, videoWidth]
+  } catch {
+    return []
+  }
+}
+
+export type Asset = {
+  fileName: string
+  path: string
 }
 
 export const encode = async (filePath: string, outName: string, outDir: string, encodeSizes: number[]) => {
   const sizes = await getAvailableSizes(filePath, encodeSizes)
-  mkdirp(outDir)
+  if (!sizes || !sizes.length) {
+    return []
+  }
 
+  mkdirp(outDir)
   const video$ = sizes.map((width: any) =>
     encodeVideo(filePath, outName, width, outDir)
       .catch(e => {
@@ -26,5 +38,5 @@ export const encode = async (filePath: string, outName: string, outDir: string, 
   return await Promise.all([
     ...video$,
     audio$,
-  ]).then(res => res.filter(t => !!t))
+  ]).then(res => res.filter(t => !!t)) as Asset[]
 }
