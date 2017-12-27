@@ -7,6 +7,7 @@ import { v4 } from 'uuid'
 import { sync as mkdirp } from 'mkdirp'
 import { flatten } from 'ramda'
 
+const VIDEO_PROCESSING_QUEUE = 'video_processing'
 const router = new Router()
 
 export const saveFile = (file: File): Promise<any> => {
@@ -36,7 +37,8 @@ router.post('/', async ctx => {
 
   const savedFiles = await Promise.all(fileList.map(saveFile))
   savedFiles.forEach(f => {
-    ctx.videoChannel.publish('video', 'video.uploaded', new Buffer(f.storedFileName))
+    ctx.indexer.index('create', f)
+    ctx.videoChannel.sendToQueue(VIDEO_PROCESSING_QUEUE, new Buffer(f.storedFileName))
   })
 
   await ctx.render('index.pug', {

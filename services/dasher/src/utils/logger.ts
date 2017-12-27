@@ -1,4 +1,4 @@
-import { Connection } from 'amqplib'
+import { Channel } from 'amqplib'
 
 export type Logger = {
   info: (t: string) => void
@@ -6,10 +6,9 @@ export type Logger = {
   error: (t: string) => void
 }
 
-export const createLogger = async (connection: Connection, topic: string) : Promise<Logger> => {
+export const createLogger = async (channel: Channel, topic: string) : Promise<Logger> => {
   const EXCHANGE = 'logs'
 
-  const channel = await connection.createChannel()
   channel.assertExchange(EXCHANGE, 'topic', { durable: false })
 
   const log = (level: string) => (message: string) =>

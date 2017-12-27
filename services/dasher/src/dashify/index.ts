@@ -19,5 +19,6 @@ export const execute = async (fileLocation: string) => {
   const encodedFilePaths = encodedFiles.map(t => t.path)
   const ret = await mp4box(encodedFilePaths, `${outDir}/${fileName}`, 'init')
   encodedFilePaths.forEach(t => unlinkSync(t))
+  console.log('complete', fileLocation)
   return ret
 }

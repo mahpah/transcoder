@@ -1,23 +1,25 @@
-import { createLogger, Logger } from './logger'
+import { createLogger, Logger } from './utils/logger'
 import Config from '@mahpah/configuration'
-import { connect, Channel, Message, Connection } from 'amqplib'
+import { connect, Channel, Message } from 'amqplib'
 import { execute } from './dashify'
 import { delay } from './utils';
 import { join } from 'path'
+import { createIndexer, Indexer } from './utils/indexer';
 
-const QUEUE = 'media'
+const VIDEO_PROCESSING = 'video_processing'
 const EXCHANGE = 'video'
 
-const onVideoUploaded = (channel: Channel, logger: Logger) => async (msg: Message) => {
+const onVideoUploaded = async (channel: Channel, logger: Logger, indexer: Indexer, msg: Message) => {
   const fileName = msg.content.toString()
   console.log(process.pid, fileName)
-  logger.info(`process file ${fileName}`)
+  logger.info(`[start] ${fileName}`)
   const filePath = join(Config.storagePath, fileName)
   try {
     const created: any = await execute(filePath)
     created.originName = fileName
     channel.publish(EXCHANGE, 'video.processed', new Buffer(JSON.stringify(created)))
-    logger.info(`file ${fileName} processed successfully, \n ${JSON.stringify(created, null, 2)}`)
+    indexer.index('update', created)
+    logger.info(`[OK] ${fileName} \nOUTPUT: ${created.path}`)
   } catch (e) {
     channel.publish(EXCHANGE, 'video.processed', new Buffer(JSON.stringify({
       originName: fileName
@@ -26,37 +28,25 @@ const onVideoUploaded = (channel: Channel, logger: Logger) => async (msg: Messag
   }
 }
 
-const listenQueue = async (connection: Connection, logger: Logger) => {
-  const channel = await connection.createChannel()
-  channel.assertQueue(QUEUE, { durable: true, exclusive: false, autoDelete: false, arguments: null })
-  channel.assertExchange(EXCHANGE, 'topic', { durable: true })
+const listenQueue = async (channel: Channel, logger: Logger, indexer: Indexer) => {
+  channel.assertQueue(VIDEO_PROCESSING, { durable: true, exclusive: false, autoDelete: false, arguments: null })
   channel.prefetch(1)
-  channel.bindQueue(QUEUE, EXCHANGE, 'video.uploaded')
-  channel.bindQueue(QUEUE, EXCHANGE, 'video.processed')
 
-  channel.consume(QUEUE, async (msg) => {
+  channel.consume(VIDEO_PROCESSING, async (msg) => {
     if (!msg) {
       return
     }
-
-    const routingKey = msg.fields.routingKey
-    switch (routingKey) {
-      case 'video.uploaded':
-        await onVideoUploaded(channel, logger)(msg)
-        break;
-
-      default:
-        break;
-    }
-
+    await onVideoUploaded(channel, logger, indexer, msg)
     channel.ack(msg)
   }, { noAck: false })
 }
 
 export const startWorker = async () => {
   const connection = await connect(Config.rabbitConnectionString)
-  const logger = await createLogger(connection, `dasher-${process.pid}`)
-  await listenQueue(connection, logger)
+  const channel = await connection.createChannel()
+  const logger = await createLogger(channel, `dasher-${process.pid}`)
+  const indexer = await createIndexer(channel)
+  await listenQueue(channel, logger, indexer)
   logger.info(`dash worker ${process.pid} is connected`)
 
   process.on('SIGINT', () => {

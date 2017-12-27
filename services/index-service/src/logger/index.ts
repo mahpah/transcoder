@@ -1,10 +1,7 @@
-import { connect } from 'amqplib'
+import { Connection, Channel } from 'amqplib'
 
-export const createLogger = async (connectionString: string, topic: string) => {
+export const createLogger = async (channel: Channel, topic: Connection) => {
   const EXCHANGE = 'logs'
-
-  const connection = await connect(connectionString)
-  const channel = await connection.createChannel()
   channel.assertExchange(EXCHANGE, 'topic', { durable: false })
 
   const log = (level: string) => (message: string) =>

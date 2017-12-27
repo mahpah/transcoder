@@ -1,51 +1,24 @@
 import app from './server'
-import { connect, Channel } from 'amqplib'
+import { connect } from 'amqplib'
 import Config from '@mahpah/configuration'
-import { createLogger, Logger } from './lib/logger'
-import { unlinkSync } from 'fs'
-import { join } from 'path';
+import { createLogger } from './lib/logger'
+import { createIndexer } from './lib/indexer';
+// import { unlinkSync } from 'fs'
+// import { join } from 'path';
 
-const EXCHANGE = 'video'
-const QUEUE = 'media'
-
-const listenQueue = async (channel: Channel, logger: Logger) => {
-  await channel.assertExchange(EXCHANGE, 'topic', { durable: true })
-  await channel.assertQueue(QUEUE, { durable: true, exclusive: false, autoDelete: false, arguments: null })
-  await channel.bindQueue(QUEUE, EXCHANGE, 'video.processed')
-
-  channel.consume(QUEUE, (msg) => {
-    if (!msg) {
-      return
-    }
-    const routingKey = msg.fields.routingKey
-
-    switch (routingKey) {
-      case 'video.processed':
-        try {
-          const content = msg.content.toString()
-          const data = JSON.parse(content)
-          unlinkSync(join(Config.storagePath, data.originName))
-        } catch (e) {
-          logger.error(JSON.stringify(e))
-        }
-        break;
-
-      default:
-        break;
-    }
-  }, { noAck: false})
-}
+const VIDEO_PROCESSING_QUEUE = 'video_processing'
 
 const prepare = async () => {
   const connection = await connect(Config.rabbitConnectionString)
-  const logger = await createLogger(connection, 'web')
-  logger.info('started')
-  app.context.logger = logger
-
   const channel = await connection.createChannel()
-  app.context.videoChannel = channel
+  await channel.assertQueue(VIDEO_PROCESSING_QUEUE, { durable: true, exclusive: false, autoDelete: false, arguments: null })
+  const logger = await createLogger(channel, 'web')
+  const indexer = await createIndexer(channel)
+  logger.info('started')
 
-  await listenQueue(channel, logger)
+  app.context.logger = logger
+  app.context.videoChannel = channel
+  app.context.indexer = indexer
 
   app.listen(3333, () => {
     console.log('server started')
